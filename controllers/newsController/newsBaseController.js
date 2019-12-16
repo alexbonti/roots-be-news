@@ -276,7 +276,7 @@ var getNews = function (payloadData, callback) {
         [
             function (cb) {
                 if (payloadData.category != "") {
-                    Service.NewsService.getNews({ category: payloadData.category }, {}, {}, function (err, data) {
+                    Service.NewsService.getNews({ category: payloadData.category }, {}, payloadData.numberOfRecords, {}, function (err, data) {
                         if (err) cb(err)
                         else {
                             news = data;
@@ -285,7 +285,7 @@ var getNews = function (payloadData, callback) {
                     })
                 }
                 else {
-                    Service.NewsService.getNews({}, {}, {}, function (err, data) {
+                    Service.NewsService.getNews({}, {}, payloadData.numberOfRecords, {}, function (err, data) {
                         if (err) cb(err)
                         else {
                             news = data;
@@ -376,10 +376,32 @@ var deleteNews = function (userData, payloadData, callback) {
         }
     );
 };
+
+var getCategories = function (callback) {
+    var categories;
+    async.series(
+        [
+            function (cb) {
+                Service.NewsService.getDistinctCategory(function (err, data) {
+                    if (err) cb(err)
+                    else {
+                        categories = data;
+                        cb();
+                    }
+                })
+            }
+        ],
+        function (err, result) {
+            if (err) return callback(err);
+            else return callback(null, { data: categories });
+        }
+    );
+};
 module.exports = {
     fetchNews: fetchNews,
     createNews: createNews,
     getNews: getNews,
     updateNews: updateNews,
-    deleteNews: deleteNews
+    deleteNews: deleteNews,
+    getCategories: getCategories
 };
