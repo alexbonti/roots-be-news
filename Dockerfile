@@ -11,7 +11,7 @@ RUN apk add --update bash
 WORKDIR /app/roots-news-backend
 COPY . .
 
-EXPOSE 8031
+EXPOSE 8061
 
 RUN cp .env.example .env
 
