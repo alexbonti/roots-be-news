@@ -115,7 +115,8 @@ var getNews = {
         },
         validate: {
             payload: {
-                category: Joi.string().optional().allow("")
+                category: Joi.string().optional().allow(""),
+                numberOfRecords: Joi.number()
             },
             failAction: UniversalFunctions.failActionFunction
         },
@@ -180,7 +181,7 @@ var updateNews = {
 
 var deleteNews = {
     method: "DELETE",
-    path: "/api/news/deleteNews",
+    path: "/api/news/deleteNews/{_id}",
     handler: function (request, h) {
         var userData =
             (request.auth &&
@@ -188,7 +189,7 @@ var deleteNews = {
                 request.auth.credentials.userData) ||
             null;
         return new Promise((resolve, reject) => {
-            Controller.NewsBaseController.deleteNews(userData, request.payload, function (
+            Controller.NewsBaseController.deleteNews(userData, request.params, function (
                 err,
                 data
             ) {
@@ -209,9 +210,44 @@ var deleteNews = {
         auth: "UserAuth",
         validate: {
             headers: UniversalFunctions.authorizationHeaderObj,
-            payload: {
+            params: {
                 _id: Joi.string().required(),
             },
+            failAction: UniversalFunctions.failActionFunction
+        },
+        plugins: {
+            "hapi-swagger": {
+                responseMessages:
+                    UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
+            }
+        }
+    }
+};
+
+var getCategories = {
+    method: "GET",
+    path: "/api/news/getCategories",
+    config: {
+        description: "Get News",
+        tags: ["api", "user"],
+        handler: function (request, h) {
+            return new Promise((resolve, reject) => {
+                Controller.NewsBaseController.getCategories(function (
+                    err,
+                    data
+                ) {
+                    if (err) reject(UniversalFunctions.sendError(err));
+                    else
+                        resolve(
+                            UniversalFunctions.sendSuccess(
+                                Config.APP_CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                                data
+                            )
+                        );
+                });
+            });
+        },
+        validate: {
             failAction: UniversalFunctions.failActionFunction
         },
         plugins: {
@@ -227,6 +263,7 @@ var NewsBaseRoute = [
     createNews,
     getNews,
     updateNews,
-    deleteNews
+    deleteNews,
+    getCategories
 ];
 module.exports = NewsBaseRoute;
