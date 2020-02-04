@@ -116,7 +116,8 @@ var getNews = {
         validate: {
             payload: {
                 category: Joi.string().optional().allow(""),
-                numberOfRecords: Joi.number()
+                numberOfRecords: Joi.number(),
+                currentPageNumber: Joi.number(),
             },
             failAction: UniversalFunctions.failActionFunction
         },
@@ -258,12 +259,53 @@ var getCategories = {
         }
     }
 };
+
+var searchByKeyword = {
+    method: "POST",
+    path: "/api/news/searchByKeyword",
+    config: {
+        description: "Search By Keyword",
+        tags: ["api", "user"],
+        handler: function (request, h) {
+            return new Promise((resolve, reject) => {
+                Controller.NewsBaseController.searchByKeyword(request.payload, function (
+                    err,
+                    data
+                ) {
+                    if (err) reject(UniversalFunctions.sendError(err));
+                    else
+                        resolve(
+                            UniversalFunctions.sendSuccess(
+                                Config.APP_CONSTANTS.STATUS_MSG.SUCCESS.DEFAULT,
+                                data
+                            )
+                        );
+                });
+            });
+        },
+        validate: {
+            failAction: UniversalFunctions.failActionFunction,
+            payload: {
+                title: Joi.string().required(),
+                numberOfRecords: Joi.number(),
+                currentPageNumber: Joi.number(),
+            }
+        },
+        plugins: {
+            "hapi-swagger": {
+                responseMessages:
+                    UniversalFunctions.CONFIG.APP_CONSTANTS.swaggerDefaultResponseMessages
+            }
+        }
+    }
+};
 var NewsBaseRoute = [
     fetchNews,
     createNews,
     getNews,
     updateNews,
     deleteNews,
-    getCategories
+    getCategories,
+    searchByKeyword
 ];
 module.exports = NewsBaseRoute;

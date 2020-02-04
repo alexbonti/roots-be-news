@@ -276,7 +276,7 @@ var getNews = function (payloadData, callback) {
         [
             function (cb) {
                 if (payloadData.category != "") {
-                    Service.NewsService.getNews({ category: payloadData.category }, {}, payloadData.numberOfRecords, {}, function (err, data) {
+                    Service.NewsService.getNews({ category: payloadData.category }, {}, ((payloadData.currentPageNumber - 1) * payloadData.numberOfRecords), payloadData.numberOfRecords, {}, function (err, data) {
                         if (err) cb(err)
                         else {
                             news = data;
@@ -285,7 +285,7 @@ var getNews = function (payloadData, callback) {
                     })
                 }
                 else {
-                    Service.NewsService.getNews({}, {}, payloadData.numberOfRecords, {}, function (err, data) {
+                    Service.NewsService.getNews({}, {}, ((payloadData.currentPageNumber - 1) * payloadData.numberOfRecords), payloadData.numberOfRecords, {}, function (err, data) {
                         if (err) cb(err)
                         else {
                             news = data;
@@ -397,11 +397,38 @@ var getCategories = function (callback) {
         }
     );
 };
+
+var searchByKeyword = function (payloadData, callback) {
+    var news;
+    async.series(
+        [
+            function (cb) {
+                var criteria = {
+                    $text: {
+                        $search: payloadData.title
+                    }
+                }
+                Service.NewsService.getNewsBySearch(criteria, {}, ((payloadData.currentPageNumber - 1) * payloadData.numberOfRecords), payloadData.numberOfRecords, {}, function (err, data) {
+                    if (err) cb(err)
+                    else {
+                        news = data;
+                        cb();
+                    }
+                })
+            }
+        ],
+        function (err, result) {
+            if (err) return callback(err);
+            else return callback(null, { data: news });
+        }
+    );
+};
 module.exports = {
     fetchNews: fetchNews,
     createNews: createNews,
     getNews: getNews,
     updateNews: updateNews,
     deleteNews: deleteNews,
-    getCategories: getCategories
+    getCategories: getCategories,
+    searchByKeyword: searchByKeyword
 };
