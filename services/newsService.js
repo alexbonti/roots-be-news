@@ -20,11 +20,15 @@ var deleteNews = function (criteria, callback) {
 };
 
 //Get News from DB
-var getNews = function (criteria, projection, numberOfRecords, options, callback) {
+var getNews = function (criteria, projection, skip, numberOfRecords, options, callback) {
     options.lean = true;
-    Models.News.find(criteria, projection, options, callback).sort({ $natural: -1 }).limit(numberOfRecords);
+    Models.News.find(criteria, projection, options, callback).sort({ $natural: -1 }).skip(skip).limit(numberOfRecords);
 };
 
+var getNewsBySearch = function (criteria, projection, skip, numberOfRecords, options, callback) {
+    options.lean = true;
+    Models.News.find(criteria, projection, options, callback).skip(skip).limit(numberOfRecords);
+};
 //Get News from DB
 var getDistinctCategory = function (callback) {
     Models.News.distinct("category", callback);
@@ -34,5 +38,6 @@ module.exports = {
     createNews: createNews,
     deleteNews: deleteNews,
     getNews: getNews,
-    getDistinctCategory: getDistinctCategory
+    getDistinctCategory: getDistinctCategory,
+    getNewsBySearch: getNewsBySearch
 };
