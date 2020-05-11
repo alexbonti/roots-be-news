@@ -14,6 +14,5 @@ var news = new Schema({
   link: { type: String, trim: true },
   category: { type: String, trim: true }
 });
-news.index({ "title": 1, "content": 1, "category": 1 }, { unique: true })
 news.index({ title: "text" })
 module.exports = mongoose.model('news', news);
