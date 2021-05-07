@@ -52,7 +52,7 @@
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
     "socket.io": "2.2.0",
-    "underscore": "1.9.1",
+    "underscore": "1.12.1",
     "validator": "11.0.0"
   },
   "author": "Navit Choudhary",
